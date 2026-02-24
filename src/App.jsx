@@ -99,40 +99,133 @@ const useScrollReveal = () => {
 
 // --- КОМПОНЕНТЫ ---
 
-// ДИНАМИЧЕСКИЙ SVG АВАТАР (Процедурная генерация)
-const DynamicAvatar = () => (
-  <svg viewBox="0 0 200 200" className="w-32 h-32 rounded-full border-4 border-gray-950 relative z-10 bg-gray-900 pointer-events-none shadow-[0_0_15px_rgba(163,230,53,0.3)]">
-    <defs>
-      <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#84cc16">
-          <animate attributeName="stop-color" values="#84cc16;#06b6d4;#a855f7;#84cc16" dur="6s" repeatCount="indefinite" />
-        </stop>
-        <stop offset="50%" stopColor="#06b6d4">
-          <animate attributeName="stop-color" values="#06b6d4;#a855f7;#84cc16;#06b6d4" dur="6s" repeatCount="indefinite" />
-        </stop>
-        <stop offset="100%" stopColor="#a855f7">
-          <animate attributeName="stop-color" values="#a855f7;#84cc16;#06b6d4;#a855f7" dur="6s" repeatCount="indefinite" />
-        </stop>
-      </linearGradient>
-    </defs>
-    
-    {/* Базовый анимированный фон (Аура) */}
-    <circle cx="100" cy="100" r="100" fill="url(#cyberGrad)" />
-    
-    {/* Геометрическая абстракция капюшона/шлема хакера */}
-    <path d="M 40 160 C 40 100, 70 40, 100 40 C 130 40, 160 100, 160 160 Z" fill="rgba(3,7,18,0.85)" stroke="#84cc16" strokeWidth="2" />
-    
-    {/* Кибернетический визор */}
-    <path d="M 60 110 L 140 110 L 125 130 L 75 130 Z" fill="url(#cyberGrad)" />
-    <path d="M 60 110 L 140 110 L 125 130 L 75 130 Z" fill="rgba(255,255,255,0.2)" />
-    
-    {/* Коммуникационные цепи (Circuit lines) */}
-    <path d="M 100 40 L 100 20 M 60 70 L 40 50 M 140 70 L 160 50 M 100 130 L 100 145" stroke="#84cc16" strokeWidth="2" strokeLinecap="round"/>
-    
-    {/* Светодиодный узел / Линза */}
-    <circle cx="100" cy="120" r="6" fill="#fff" />
-  </svg>
-);
+// 3D AURORA TETRAHEDRON AVATAR
+const DynamicAvatar = () => {
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: 0, y: 0 });
+  const rotRef = useRef({ ax: 0.4, ay: 0.3 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const SIZE = 128;
+    canvas.width = SIZE;
+    canvas.height = SIZE;
+    let animId;
+    let t = 0;
+
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = {
+        x: (e.clientX - rect.left - SIZE / 2) / SIZE,
+        y: (e.clientY - rect.top - SIZE / 2) / SIZE,
+      };
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Vertices of a regular tetrahedron
+    const verts = [
+      [0, 1, 0],
+      [Math.sqrt(8 / 9), -1 / 3, 0],
+      [-Math.sqrt(2 / 9), -1 / 3, Math.sqrt(2 / 3)],
+      [-Math.sqrt(2 / 9), -1 / 3, -Math.sqrt(2 / 3)],
+    ];
+    const faces = [[0, 1, 2], [0, 1, 3], [0, 2, 3], [1, 2, 3]];
+
+    const rotX = (v, a) => [v[0], v[1] * Math.cos(a) - v[2] * Math.sin(a), v[1] * Math.sin(a) + v[2] * Math.cos(a)];
+    const rotY = (v, a) => [v[0] * Math.cos(a) + v[2] * Math.sin(a), v[1], -v[0] * Math.sin(a) + v[2] * Math.cos(a)];
+
+    const project = (v) => {
+      const z = v[2] + 3;
+      const fov = SIZE * 1.1;
+      return [v[0] / z * fov + SIZE / 2, v[1] / z * fov + SIZE / 2, v[2]];
+    };
+
+    const auroraColors = (
+      hue, alpha
+    ) => `hsla(${hue},100%,65%,${alpha})`;
+
+    const draw = () => {
+      t += 0.012;
+      // Smooth pursuit toward mouse
+      rotRef.current.ax += (mouseRef.current.y * 2 - rotRef.current.ax) * 0.04;
+      rotRef.current.ay += (mouseRef.current.x * 2 - rotRef.current.ay) * 0.04;
+
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      // Glow halo behind gem
+      const hue0 = (t * 40) % 360;
+      const grad = ctx.createRadialGradient(SIZE / 2, SIZE / 2, 6, SIZE / 2, SIZE / 2, SIZE / 2);
+      grad.addColorStop(0, `hsla(${hue0},100%,70%,0.35)`);
+      grad.addColorStop(0.55, `hsla(${(hue0 + 90) % 360},100%,60%,0.15)`);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, SIZE, SIZE);
+
+      // Transform verts
+      const ax = rotRef.current.ax + t * 0.3;
+      const ay = rotRef.current.ay + t * 0.22;
+      const transformed = verts.map(v => rotY(rotX(v, ax), ay));
+      const projected = transformed.map(project);
+
+      // Sort faces back-to-front
+      const sorted = faces.map((f, i) => {
+        const avgZ = (transformed[f[0]][2] + transformed[f[1]][2] + transformed[f[2]][2]) / 3;
+        return { f, avgZ, i };
+      }).sort((a, b) => a.avgZ - b.avgZ);
+
+      sorted.forEach(({ f, i }) => {
+        const hue = (hue0 + i * 75) % 360;
+        const [p0, p1, p2] = [projected[f[0]], projected[f[1]], projected[f[2]]];
+        const cx2 = (p0[0] + p1[0] + p2[0]) / 3;
+        const cy2 = (p0[1] + p1[1] + p2[1]) / 3;
+
+        // Face fill — shimmering aurora gradient per face
+        const faceGrad = ctx.createLinearGradient(p0[0], p0[1], cx2, cy2);
+        faceGrad.addColorStop(0, auroraColors(hue, 0.55));
+        faceGrad.addColorStop(0.5, auroraColors((hue + 60) % 360, 0.35));
+        faceGrad.addColorStop(1, auroraColors((hue + 140) % 360, 0.15));
+
+        ctx.beginPath();
+        ctx.moveTo(p0[0], p0[1]);
+        ctx.lineTo(p1[0], p1[1]);
+        ctx.lineTo(p2[0], p2[1]);
+        ctx.closePath();
+        ctx.fillStyle = faceGrad;
+        ctx.fill();
+
+        // Bright edge highlights
+        ctx.strokeStyle = auroraColors((hue + 30) % 360, 0.9);
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Diamond sparkle at vertex nearest viewer
+        const nearV = [p0, p1, p2].reduce((a, b) => a[2] > b[2] ? a : b);
+        const sparkGrad = ctx.createRadialGradient(nearV[0], nearV[1], 0, nearV[0], nearV[1], 8);
+        sparkGrad.addColorStop(0, `hsla(${(hue + 20) % 360},100%,95%,0.9)`);
+        sparkGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = sparkGrad;
+        ctx.beginPath();
+        ctx.arc(nearV[0], nearV[1], 8, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      animId = requestAnimationFrame(draw);
+    };
+    draw();
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="w-32 h-32 rounded-full border-2 border-white/10 relative z-10 pointer-events-none shadow-[0_0_30px_rgba(100,200,255,0.4)]"
+    />
+  );
+};
 
 // ТЕРМОДИНАМИЧЕСКИЙ ФОН (Кристаллизация H2O -> Тетраэдры)
 const PhaseTransitionBackground = () => {
@@ -144,7 +237,7 @@ const PhaseTransitionBackground = () => {
     let animationFrameId;
     let particles = [];
     let currentHue = 110; // Неоновый салатовый базовый тон
-    
+
     // Вектор мыши (источник тепловой энергии)
     let heatSource = {
       x: null,
@@ -174,10 +267,10 @@ const PhaseTransitionBackground = () => {
 
     // Вершины правильного тетраэдра
     const tetrahedronVertices = [
-      {x: 1, y: 1, z: 1},
-      {x: -1, y: -1, z: 1},
-      {x: -1, y: 1, z: -1},
-      {x: 1, y: -1, z: -1}
+      { x: 1, y: 1, z: 1 },
+      { x: -1, y: -1, z: 1 },
+      { x: -1, y: 1, z: -1 },
+      { x: 1, y: -1, z: -1 }
     ];
 
     class ThermodynamicParticle {
@@ -186,42 +279,42 @@ const PhaseTransitionBackground = () => {
         this.y = Math.random() * canvas.height;
         this.baseVx = (Math.random() - 0.5) * 1.5;
         this.baseVy = (Math.random() - 0.5) * 1.5;
-        
+
         // Температура: 1 = Жидкость, 0 = Твердый кристалл
-        this.temperature = Math.random(); 
-        
+        this.temperature = Math.random();
+
         // Углы вращения для 3D проекции
         this.angleX = Math.random() * Math.PI * 2;
         this.angleY = Math.random() * Math.PI * 2;
         this.rotSpeedX = (Math.random() - 0.5) * 0.05;
         this.rotSpeedY = (Math.random() - 0.5) * 0.05;
-        
+
         this.maxRadius = Math.random() * 4 + 3; // Размер кристалла
       }
-      
+
       update() {
         // Естественное охлаждение (энтропия)
         this.temperature -= 0.003;
-        
+
         // Локальный нагрев от курсора
         if (heatSource.x != null && heatSource.y != null) {
           let dx = this.x - heatSource.x;
           let dy = this.y - heatSource.y;
           let distance = Math.sqrt(dx * dx + dy * dy);
-          
+
           if (distance < heatSource.radius) {
             // Интенсивность нагрева обратно пропорциональна расстоянию
             let heatApplied = (heatSource.radius - distance) / heatSource.radius;
             this.temperature += heatApplied * 0.05;
           }
         }
-        
+
         // Ограничение температуры [0, 1]
         this.temperature = Math.max(0, Math.min(1, this.temperature));
 
         // Кинематика зависит от температуры (закон вязкости)
         let kineticFactor = Math.max(0.05, this.temperature); // Кристаллы почти не двигаются
-        
+
         this.x += this.baseVx * kineticFactor;
         this.y += this.baseVy * kineticFactor;
 
@@ -233,15 +326,15 @@ const PhaseTransitionBackground = () => {
         this.angleX += this.rotSpeedX;
         this.angleY += this.rotSpeedY;
       }
-      
+
       draw(hue) {
         let freezeFactor = 1 - this.temperature; // 0 = Жидкость, 1 = Лед
-        
+
         // Вычисление динамического цвета:
         // Жидкость -> салатовый, Лед -> белый/светло-голубой
         let luma = 50 + (freezeFactor * 40); // 50% -> 90%
         let alpha = 0.3 + (freezeFactor * 0.6); // 0.3 -> 0.9
-        
+
         ctx.strokeStyle = `hsla(${hue}, 100%, ${luma}%, ${alpha})`;
         ctx.fillStyle = `hsla(${hue}, 100%, ${luma}%, ${alpha * 0.5})`;
         ctx.lineWidth = 1 + freezeFactor;
@@ -254,7 +347,7 @@ const PhaseTransitionBackground = () => {
         } else {
           // ФАЗА 2: Кристаллизация (Проекция Тетраэдра)
           let currentSize = this.maxRadius * freezeFactor;
-          
+
           // Проекция 3D вершин в 2D пространство
           let projected = tetrahedronVertices.map(v => {
             // Вращение по оси X
@@ -263,7 +356,7 @@ const PhaseTransitionBackground = () => {
             // Вращение по оси Y
             let x2 = v.x * Math.cos(this.angleY) + z1 * Math.sin(this.angleY);
             let z2 = -v.x * Math.sin(this.angleY) + z1 * Math.cos(this.angleY);
-            
+
             return {
               x: this.x + x2 * currentSize,
               y: this.y + y1 * currentSize
@@ -279,14 +372,14 @@ const PhaseTransitionBackground = () => {
           ctx.moveTo(projected[1].x, projected[1].y); ctx.lineTo(projected[3].x, projected[3].y);
           ctx.moveTo(projected[2].x, projected[2].y); ctx.lineTo(projected[3].x, projected[3].y);
           ctx.stroke();
-          
+
           // Легкая заливка кристаллов
-          if(freezeFactor > 0.6) {
-             ctx.beginPath();
-             ctx.moveTo(projected[0].x, projected[0].y);
-             ctx.lineTo(projected[1].x, projected[1].y);
-             ctx.lineTo(projected[2].x, projected[2].y);
-             ctx.fill();
+          if (freezeFactor > 0.6) {
+            ctx.beginPath();
+            ctx.moveTo(projected[0].x, projected[0].y);
+            ctx.lineTo(projected[1].x, projected[1].y);
+            ctx.lineTo(projected[2].x, projected[2].y);
+            ctx.fill();
           }
         }
       }
@@ -296,10 +389,10 @@ const PhaseTransitionBackground = () => {
 
     const animate = () => {
       // Инкремент тона (Hue)
-      currentHue = (currentHue + 0.1) % 360; 
-      
+      currentHue = (currentHue + 0.1) % 360;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       particles.forEach(p => {
         p.update();
         p.draw(currentHue);
@@ -316,7 +409,7 @@ const PhaseTransitionBackground = () => {
           if (distance < 100 && particles[i].temperature < 0.6 && particles[j].temperature < 0.6) {
             let combinedFreeze = (2 - particles[i].temperature - particles[j].temperature) / 2; // [0, 1]
             let luma = 50 + (combinedFreeze * 40);
-            
+
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -330,7 +423,7 @@ const PhaseTransitionBackground = () => {
     };
 
     animate();
-    
+
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', handleMouseMove);
@@ -347,9 +440,8 @@ const RevealSection = ({ children, className = '' }) => {
   return (
     <div
       ref={ref}
-      className={`transition-all duration-1000 transform ${
-        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-      } ${className}`}
+      className={`transition-all duration-1000 transform ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+        } ${className}`}
     >
       {children}
     </div>
@@ -360,7 +452,7 @@ const ExperienceCard = ({ role, company, period, description }) => {
   return (
     <div className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active w-full mb-12`}>
       <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 w-4 h-4 bg-lime-400 rounded-full border-4 border-gray-900 z-10 group-hover:bg-purple-500 group-hover:shadow-[0_0_15px_#a855f7] transition-all duration-300"></div>
-      
+
       <div className={`w-full md:w-[45%] bg-gray-800/50 backdrop-blur-md border border-gray-700 p-6 rounded-2xl shadow-lg hover:border-lime-400/50 hover:shadow-[0_0_25px_rgba(163,230,53,0.15)] transition-all duration-500 relative overflow-hidden pointer-events-auto`}>
         <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-lime-400 to-purple-500"></div>
         <h3 className="text-xl font-bold text-white mb-1">{role}</h3>
@@ -395,7 +487,8 @@ export default function App() {
     <div className="min-h-screen bg-gray-950 text-gray-200 font-sans selection:bg-lime-500/30 selection:text-lime-200 overflow-x-hidden relative">
       <PhaseTransitionBackground />
 
-      <style dangerouslySetInnerHTML={{__html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #030712; }
         ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
@@ -409,12 +502,11 @@ export default function App() {
       <div className="absolute top-6 right-6 z-50 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md p-2 rounded-full border border-gray-700 shadow-lg pointer-events-auto">
         <Globe className="w-4 h-4 text-lime-400 ml-2" />
         {['en', 'es', 'ru'].map(l => (
-          <button 
-            key={l} 
+          <button
+            key={l}
             onClick={() => setLang(l)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-              lang === l ? 'bg-gradient-to-r from-lime-400 to-purple-500 text-gray-900 shadow-[0_0_10px_rgba(163,230,53,0.5)]' : 'text-gray-400 hover:text-white'
-            }`}
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${lang === l ? 'bg-gradient-to-r from-lime-400 to-purple-500 text-gray-900 shadow-[0_0_10px_rgba(163,230,53,0.5)]' : 'text-gray-400 hover:text-white'
+              }`}
           >
             {l.toUpperCase()}
           </button>
@@ -422,7 +514,7 @@ export default function App() {
       </div>
 
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20">
-        
+
         {/* HERO SECTION */}
         <RevealSection className="text-center mb-24 mt-10 pointer-events-auto">
           <div className="inline-block p-1 rounded-full bg-gradient-to-r from-lime-400 to-purple-500 mb-6 relative group">
@@ -435,7 +527,7 @@ export default function App() {
           <h2 className="text-2xl md:text-3xl font-mono text-lime-400 h-10 flex justify-center items-center pointer-events-none">
             &gt; {text}<span className="animate-pulse ml-1 inline-block w-3 h-8 bg-purple-500"></span>
           </h2>
-          
+
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm">
             <a href="https://www.linkedin.com/in/alexei-boklag/" target="_blank" rel="noreferrer" className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full hover:bg-gray-700 hover:text-lime-400 transition-colors backdrop-blur-sm border border-gray-700">
               <Linkedin className="w-4 h-4 mr-2 text-blue-500" /> LinkedIn
@@ -473,10 +565,10 @@ export default function App() {
             <h2 className="text-3xl font-bold">{t.expTitle}</h2>
             <div className="h-[1px] flex-grow bg-gradient-to-r from-purple-400/50 to-transparent ml-6"></div>
           </div>
-          
+
           <div className="relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-600 before:to-transparent">
             {t.experience.map((exp, index) => (
-              <ExperienceCard 
+              <ExperienceCard
                 key={index}
                 role={exp.role}
                 company={exp.company}
@@ -494,7 +586,7 @@ export default function App() {
             <h2 className="text-3xl font-bold">{t.skillsTitle}</h2>
             <div className="h-[1px] flex-grow bg-gradient-to-r from-lime-400/50 to-transparent ml-6"></div>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-gray-800/40 p-6 rounded-2xl border border-gray-700/50 hover:border-lime-400/50 transition-colors">
               <div className="flex items-center mb-4 text-lime-400">
@@ -537,7 +629,7 @@ export default function App() {
         {/* EDUCATION & AWARDS SECTION */}
         <RevealSection className="mb-12 pointer-events-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-            
+
             {/* Education */}
             <div>
               <div className="flex items-center mb-8 pointer-events-none">
@@ -572,7 +664,7 @@ export default function App() {
                 <Award className="w-8 h-8 text-lime-400 mr-4" />
                 <h2 className="text-3xl font-bold">{t.awardsTitle}</h2>
               </div>
-              
+
               <div className="bg-gray-800/30 p-6 rounded-2xl border border-gray-700/50 mb-6">
                 <h4 className="text-white font-bold mb-4 flex items-center">
                   <ShieldCheck className="w-5 h-5 mr-2 text-lime-400" /> {t.awardsSubtitle}
