@@ -1,5 +1,71 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { Mail, MapPin, Send, Briefcase, GraduationCap, Code, User, Award, Terminal, ShieldCheck, Cpu, Globe, Linkedin, ArrowUp, ChevronUp, Sparkles } from 'lucide-react';
+import { Mail, MapPin, Send, Briefcase, GraduationCap, Code, User, Award, Terminal, ShieldCheck, Cpu, Globe, Linkedin, ArrowUp, ChevronUp, Sparkles, Moon, Sun, Sunrise, Sunset } from 'lucide-react';
+
+// --- MUI-INSPIRED THEME SYSTEM ---
+const themes = [
+  { id: 'night', label: '🌙', icon: Moon, name: 'Night', gradient: 'from-indigo-900 to-gray-900' },
+  { id: 'evening', label: '🌆', icon: Sunset, name: 'Evening', gradient: 'from-purple-900 to-pink-900' },
+  { id: 'morning', label: '🌅', icon: Sunrise, name: 'Morning', gradient: 'from-orange-300 to-amber-200' },
+  { id: 'day', label: '☀️', icon: Sun, name: 'Day', gradient: 'from-sky-300 to-blue-200' },
+];
+
+const ThemeSwitcher = ({ theme, setTheme }) => {
+  const currentIdx = themes.findIndex(t => t.id === theme);
+  const isDark = theme === 'night' || theme === 'evening';
+
+  return (
+    <div className="fixed top-6 left-6 z-50 pointer-events-auto">
+      {/* Outer container with glow */}
+      <div className="relative group">
+        {/* Orbital glow ring */}
+        <div className={`absolute -inset-1.5 rounded-2xl blur-md opacity-40 group-hover:opacity-70 transition-all duration-700 bg-gradient-to-r ${themes[currentIdx].gradient}`} />
+
+        {/* Main pill */}
+        <div className={`relative flex items-center gap-1 p-1.5 rounded-2xl border backdrop-blur-xl shadow-2xl transition-all duration-500 ${isDark
+            ? 'bg-gray-900/90 border-white/10'
+            : 'bg-white/80 border-gray-300/40'
+          }`}>
+          {/* Sliding indicator */}
+          <div
+            className={`absolute h-9 w-9 rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] bg-gradient-to-br ${themes[currentIdx].gradient} shadow-lg`}
+            style={{ left: `${6 + currentIdx * 40}px` }}
+          />
+
+          {themes.map((t, i) => {
+            const Icon = t.icon;
+            const isActive = t.id === theme;
+            return (
+              <Tooltip key={t.id} content={t.name} side="bottom">
+                <button
+                  onClick={() => {
+                    document.documentElement.setAttribute('data-theme', t.id);
+                    setTheme(t.id);
+                  }}
+                  className={`relative z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-500 ${isActive
+                      ? 'text-white scale-110 drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]'
+                      : isDark
+                        ? 'text-gray-500 hover:text-gray-300'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  aria-label={`Switch to ${t.name} theme`}
+                >
+                  <Icon className={`w-4.5 h-4.5 transition-transform duration-500 ${isActive ? 'rotate-0 scale-110' : 'rotate-12 scale-90'
+                    }`} />
+                </button>
+              </Tooltip>
+            );
+          })}
+        </div>
+
+        {/* Theme name tooltip on hover */}
+        <div className={`absolute -bottom-7 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap ${isDark ? 'text-gray-500' : 'text-gray-400'
+          }`}>
+          {themes[currentIdx].name}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // --- SHADCN-INSPIRED COMPONENTS (zero dependencies, hand-crafted) ---
 
@@ -594,7 +660,13 @@ const ExperienceCard = ({ role, company, period, description }) => {
 export default function App() {
   const [lang, setLang] = useState('en');
   const [text, setText] = useState('');
+  const [theme, setTheme] = useState('night');
   const t = translations[lang];
+  const isDark = theme === 'night' || theme === 'evening';
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     let i = 0;
@@ -608,29 +680,36 @@ export default function App() {
   }, [lang, t.role]);
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200 font-sans selection:bg-lime-500/30 selection:text-lime-200 overflow-x-hidden relative">
+    <div className="min-h-screen font-sans overflow-x-hidden relative transition-colors duration-500" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', selectionBackground: 'var(--selection-bg)' }}>
       <PhaseTransitionBackground />
 
       <style dangerouslySetInnerHTML={{
         __html: `
+        ::selection { background: var(--selection-bg); color: var(--selection-text); }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #030712; }
-        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #84cc16; }
-        /* Обеспечиваем, чтобы элементы UI кликались поверх канваса */
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-1); }
         main, header, footer, .z-50 { pointer-events: none; }
         a, button, .pointer-events-auto { pointer-events: auto; }
       `}} />
 
+      {/* Theme Switcher (MUI-inspired) */}
+      <ThemeSwitcher theme={theme} setTheme={setTheme} />
+
       {/* Language Switcher */}
-      <div className="absolute top-6 right-6 z-50 flex items-center gap-2 bg-gray-900/80 backdrop-blur-md p-2 rounded-full border border-gray-700 shadow-lg pointer-events-auto">
-        <Globe className="w-4 h-4 text-lime-400 ml-2" />
+      <div className={`absolute top-6 right-6 z-50 flex items-center gap-2 backdrop-blur-md p-2 rounded-full border shadow-lg pointer-events-auto transition-all duration-500 ${isDark ? 'bg-gray-900/80 border-gray-700' : 'bg-white/80 border-gray-300/40'
+        }`}>
+        <Globe className="w-4 h-4 ml-2" style={{ color: 'var(--accent-1)' }} />
         {['en', 'es', 'ru'].map(l => (
           <button
             key={l}
             onClick={() => setLang(l)}
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${lang === l ? 'bg-gradient-to-r from-lime-400 to-purple-500 text-gray-900 shadow-[0_0_10px_rgba(163,230,53,0.5)]' : 'text-gray-400 hover:text-white'
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 ${lang === l
+                ? 'text-white shadow-lg'
+                : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-500 hover:text-gray-800'
               }`}
+            style={lang === l ? { background: `linear-gradient(to right, var(--gradient-from), var(--gradient-to))` } : {}}
           >
             {l.toUpperCase()}
           </button>
@@ -645,11 +724,11 @@ export default function App() {
             <div className="absolute -inset-1 bg-gradient-to-r from-lime-400 to-purple-500 rounded-full blur opacity-40 group-hover:opacity-75 transition duration-500"></div>
             <DynamicAvatar />
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 tracking-tight pointer-events-none">
+          <h1 className="text-5xl md:text-7xl font-extrabold mb-4 tracking-tight pointer-events-none" style={{ color: 'var(--text-heading)' }}>
             Boklag Aleksei
           </h1>
-          <h2 className="text-2xl md:text-3xl font-mono text-lime-400 h-10 flex justify-center items-center pointer-events-none">
-            &gt; {text}<span className="animate-pulse ml-1 inline-block w-3 h-8 bg-purple-500"></span>
+          <h2 className="text-2xl md:text-3xl font-mono h-10 flex justify-center items-center pointer-events-none" style={{ color: 'var(--accent-1)' }}>
+            &gt; {text}<span className="animate-pulse ml-1 inline-block w-3 h-8" style={{ backgroundColor: 'var(--accent-2)' }}></span>
           </h2>
 
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm">
@@ -848,7 +927,7 @@ export default function App() {
         </RevealSection>
       </main>
 
-      <footer className="border-t border-gray-800 bg-gray-950/80 backdrop-blur-sm py-8 text-center text-gray-500 text-sm relative z-10 pointer-events-none">
+      <footer className="border-t backdrop-blur-sm py-8 text-center text-sm relative z-10 pointer-events-none transition-all duration-500" style={{ borderColor: 'var(--border-primary)', backgroundColor: 'var(--bg-footer)', color: 'var(--text-muted)' }}>
         <p>© 2026 Boklag Aleksei. {t.role}.</p>
         <p className="mt-2 text-xs">{t.developedWith}</p>
       </footer>

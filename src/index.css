@@ -1,3 +1,121 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* === MUI-INSPIRED THEME SYSTEM (4 themes via CSS Custom Properties) === */
+
+:root,
+[data-theme="night"] {
+    --bg-primary: #030712;
+    --bg-secondary: rgba(31, 41, 55, 0.5);
+    --bg-card: rgba(31, 41, 55, 0.4);
+    --bg-card-hover: rgba(31, 41, 55, 0.6);
+    --bg-surface: rgba(31, 41, 55, 0.3);
+    --bg-footer: rgba(3, 7, 18, 0.8);
+    --text-primary: #e5e7eb;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    --text-heading: #ffffff;
+    --border-primary: rgba(55, 65, 81, 0.5);
+    --border-hover: rgba(163, 230, 53, 0.5);
+    --accent-1: #84cc16;
+    --accent-2: #a855f7;
+    --accent-3: #06b6d4;
+    --scrollbar-track: #030712;
+    --scrollbar-thumb: #1f2937;
+    --selection-bg: rgba(163, 230, 53, 0.3);
+    --selection-text: #ecfccb;
+    --particle-base-hue: 110;
+    --gradient-from: #84cc16;
+    --gradient-to: #a855f7;
+}
+
+[data-theme="evening"] {
+    --bg-primary: #1a1033;
+    --bg-secondary: rgba(55, 30, 80, 0.5);
+    --bg-card: rgba(55, 30, 80, 0.4);
+    --bg-card-hover: rgba(75, 40, 110, 0.6);
+    --bg-surface: rgba(55, 30, 80, 0.3);
+    --bg-footer: rgba(26, 16, 51, 0.8);
+    --text-primary: #e2d9f3;
+    --text-secondary: #b8a9d4;
+    --text-muted: #8b7aaa;
+    --text-heading: #f5f0ff;
+    --border-primary: rgba(100, 60, 150, 0.4);
+    --border-hover: rgba(192, 132, 252, 0.5);
+    --accent-1: #c084fc;
+    --accent-2: #f472b6;
+    --accent-3: #818cf8;
+    --scrollbar-track: #1a1033;
+    --scrollbar-thumb: #3b1f6e;
+    --selection-bg: rgba(192, 132, 252, 0.3);
+    --selection-text: #f3e8ff;
+    --particle-base-hue: 270;
+    --gradient-from: #c084fc;
+    --gradient-to: #f472b6;
+}
+
+[data-theme="morning"] {
+    --bg-primary: #fef9ef;
+    --bg-secondary: rgba(255, 237, 213, 0.6);
+    --bg-card: rgba(255, 237, 213, 0.5);
+    --bg-card-hover: rgba(254, 215, 170, 0.6);
+    --bg-surface: rgba(255, 237, 213, 0.4);
+    --bg-footer: rgba(254, 249, 239, 0.9);
+    --text-primary: #44403c;
+    --text-secondary: #78716c;
+    --text-muted: #a8a29e;
+    --text-heading: #1c1917;
+    --border-primary: rgba(214, 211, 209, 0.6);
+    --border-hover: rgba(251, 146, 60, 0.5);
+    --accent-1: #ea580c;
+    --accent-2: #dc2626;
+    --accent-3: #f59e0b;
+    --scrollbar-track: #fef9ef;
+    --scrollbar-thumb: #d6d3d1;
+    --selection-bg: rgba(251, 146, 60, 0.25);
+    --selection-text: #7c2d12;
+    --particle-base-hue: 25;
+    --gradient-from: #ea580c;
+    --gradient-to: #dc2626;
+}
+
+[data-theme="day"] {
+    --bg-primary: #f0f9ff;
+    --bg-secondary: rgba(224, 242, 254, 0.6);
+    --bg-card: rgba(224, 242, 254, 0.5);
+    --bg-card-hover: rgba(186, 230, 253, 0.5);
+    --bg-surface: rgba(224, 242, 254, 0.4);
+    --bg-footer: rgba(240, 249, 255, 0.9);
+    --text-primary: #334155;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --text-heading: #0f172a;
+    --border-primary: rgba(148, 163, 184, 0.3);
+    --border-hover: rgba(14, 165, 233, 0.5);
+    --accent-1: #0ea5e9;
+    --accent-2: #6366f1;
+    --accent-3: #10b981;
+    --scrollbar-track: #f0f9ff;
+    --scrollbar-thumb: #cbd5e1;
+    --selection-bg: rgba(14, 165, 233, 0.2);
+    --selection-text: #0c4a6e;
+    --particle-base-hue: 200;
+    --gradient-from: #0ea5e9;
+    --gradient-to: #6366f1;
+}
+
+/* Apply theme transitions globally */
+*,
+*::before,
+*::after {
+    transition-property: background-color, border-color, color, box-shadow;
+    transition-duration: 0.4s;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Override for animation-sensitive elements */
+canvas,
+.no-theme-transition {
+    transition: none !important;
+}
