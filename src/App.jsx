@@ -1,5 +1,129 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Mail, MapPin, Send, Briefcase, GraduationCap, Code, User, Award, Terminal, ShieldCheck, Cpu, Globe, Linkedin } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
+import { Mail, MapPin, Send, Briefcase, GraduationCap, Code, User, Award, Terminal, ShieldCheck, Cpu, Globe, Linkedin, ArrowUp, ChevronUp, Sparkles } from 'lucide-react';
+
+// --- SHADCN-INSPIRED COMPONENTS (zero dependencies, hand-crafted) ---
+
+// 1. TOOLTIP — shadcn/ui style with smooth scale+fade animation
+const Tooltip = ({ children, content, side = 'top' }) => {
+  const [show, setShow] = useState(false);
+  const sideClasses = {
+    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
+    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+    left: 'right-full top-1/2 -translate-y-1/2 mr-2',
+    right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  };
+  return (
+    <div className="relative inline-flex" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+      {children}
+      <div className={`absolute z-50 ${sideClasses[side]} pointer-events-none transition-all duration-200 ${show ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+        }`}>
+        <div className="px-3 py-1.5 text-xs font-medium text-white bg-gray-900 border border-gray-700 rounded-lg shadow-xl backdrop-blur-md whitespace-nowrap">
+          {content}
+          <div className={`absolute w-2 h-2 bg-gray-900 border border-gray-700 rotate-45 ${side === 'top' ? 'top-full left-1/2 -translate-x-1/2 -mt-1 border-t-0 border-l-0' :
+            side === 'bottom' ? 'bottom-full left-1/2 -translate-x-1/2 mb-0 -mb-1 border-b-0 border-r-0' : ''
+            }`} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// 2. BADGE — shadcn/ui style animated count badge
+const Badge = ({ count, variant = 'lime' }) => {
+  const variants = {
+    lime: 'bg-lime-400/20 text-lime-300 border-lime-400/30 shadow-lime-400/20',
+    purple: 'bg-purple-400/20 text-purple-300 border-purple-400/30 shadow-purple-400/20',
+    blue: 'bg-blue-400/20 text-blue-300 border-blue-400/30 shadow-blue-400/20',
+  };
+  return (
+    <span className={`inline-flex items-center justify-center min-w-[1.5rem] h-6 px-2 ml-2 text-xs font-bold rounded-full border shadow-sm ${variants[variant]} transition-all duration-300 hover:scale-110`}>
+      {count}
+    </span>
+  );
+};
+
+// 3. SCROLL-TO-TOP — masterpiece aurora button
+const ScrollToTopButton = () => {
+  const [visible, setVisible] = useState(false);
+  const [particles, setParticles] = useState([]);
+  const btnRef = useRef(null);
+  let particleId = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 400);
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const spawnParticles = useCallback(() => {
+    const newParticles = Array.from({ length: 12 }, (_, i) => ({
+      id: particleId.current++,
+      angle: (i / 12) * Math.PI * 2,
+      hue: (i / 12) * 360,
+    }));
+    setParticles(prev => [...prev, ...newParticles]);
+    setTimeout(() => {
+      setParticles(prev => prev.filter(p => !newParticles.includes(p)));
+    }, 700);
+  }, []);
+
+  const scrollToTop = () => {
+    spawnParticles();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className={`fixed bottom-8 right-8 z-50 pointer-events-auto transition-all duration-500 ${visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-75 pointer-events-none'
+      }`}>
+      {/* Particle burst */}
+      {particles.map(p => (
+        <div
+          key={p.id}
+          className="absolute left-1/2 top-1/2 w-1.5 h-1.5 rounded-full animate-ping"
+          style={{
+            background: `hsl(${p.hue}, 100%, 70%)`,
+            transform: `translate(-50%, -50%) translate(${Math.cos(p.angle) * 40}px, ${Math.sin(p.angle) * 40}px)`,
+            animation: 'particle-burst 0.7s ease-out forwards',
+          }}
+        />
+      ))}
+
+      {/* Outer aurora ring */}
+      <div className="absolute -inset-1 rounded-full animate-spin" style={{ animationDuration: '4s' }}>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-lime-400 via-cyan-400 via-purple-500 to-lime-400 opacity-60 blur-sm" />
+      </div>
+
+      {/* Pulsing glow */}
+      <div className="absolute -inset-2 rounded-full bg-gradient-to-r from-lime-400/30 to-purple-500/30 blur-lg animate-pulse" />
+
+      {/* Main button */}
+      <button
+        ref={btnRef}
+        onClick={scrollToTop}
+        className="relative w-14 h-14 rounded-full bg-gray-900/90 backdrop-blur-xl border border-white/10 flex items-center justify-center group hover:bg-gray-800/90 transition-all duration-300 hover:scale-110 hover:shadow-[0_0_30px_rgba(163,230,53,0.4)] active:scale-95"
+        aria-label="Scroll to top"
+      >
+        {/* Inner gradient ring */}
+        <div className="absolute inset-0.5 rounded-full border border-transparent bg-gradient-to-r from-lime-400/20 via-cyan-400/20 to-purple-500/20" />
+
+        {/* Arrow icon with glow */}
+        <ChevronUp className="w-6 h-6 text-lime-400 relative z-10 transition-all duration-300 group-hover:text-white group-hover:-translate-y-0.5 group-hover:drop-shadow-[0_0_8px_rgba(163,230,53,0.8)]" />
+
+        {/* Sparkle accent */}
+        <Sparkles className="absolute top-1 right-1 w-3 h-3 text-purple-400 opacity-0 group-hover:opacity-100 transition-all duration-300 animate-pulse" />
+      </button>
+
+      {/* CSS for particle burst */}
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @keyframes particle-burst {
+          0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+          100% { opacity: 0; transform: translate(-50%, -50%) scale(0) translate(var(--tx, 0), var(--ty, 0)); }
+        }
+      `}} />
+    </div>
+  );
+};
 
 // --- СЛОВАРЬ ПЕРЕВОДОВ (i18n DICTIONARY) ---
 const translations = {
@@ -529,15 +653,21 @@ export default function App() {
           </h2>
 
           <div className="flex flex-wrap justify-center gap-4 mt-8 text-sm">
-            <a href="https://www.linkedin.com/in/alexei-boklag/" target="_blank" rel="noreferrer" className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full hover:bg-gray-700 hover:text-lime-400 transition-colors backdrop-blur-sm border border-gray-700">
-              <Linkedin className="w-4 h-4 mr-2 text-blue-500" /> LinkedIn
-            </a>
-            <span className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full backdrop-blur-sm border border-gray-700 pointer-events-none">
-              <MapPin className="w-4 h-4 mr-2 text-red-400" /> Marbella, Spain
-            </span>
-            <a href="https://t.me/daskibo" target="_blank" rel="noreferrer" className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full hover:bg-gray-700 hover:text-lime-400 transition-colors backdrop-blur-sm border border-gray-700">
-              <Send className="w-4 h-4 mr-2 text-blue-400" /> @daskibo
-            </a>
+            <Tooltip content="View professional profile" side="bottom">
+              <a href="https://www.linkedin.com/in/alexei-boklag/" target="_blank" rel="noreferrer" className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full hover:bg-gray-700 hover:text-lime-400 transition-colors backdrop-blur-sm border border-gray-700">
+                <Linkedin className="w-4 h-4 mr-2 text-blue-500" /> LinkedIn
+              </a>
+            </Tooltip>
+            <Tooltip content="Current location" side="bottom">
+              <span className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full backdrop-blur-sm border border-gray-700">
+                <MapPin className="w-4 h-4 mr-2 text-red-400" /> Marbella, Spain
+              </span>
+            </Tooltip>
+            <Tooltip content="Message me on Telegram" side="bottom">
+              <a href="https://t.me/daskibo" target="_blank" rel="noreferrer" className="flex items-center px-4 py-2 bg-gray-800/80 rounded-full hover:bg-gray-700 hover:text-lime-400 transition-colors backdrop-blur-sm border border-gray-700">
+                <Send className="w-4 h-4 mr-2 text-blue-400" /> @daskibo
+              </a>
+            </Tooltip>
           </div>
         </RevealSection>
 
@@ -592,10 +722,13 @@ export default function App() {
               <div className="flex items-center mb-4 text-lime-400">
                 <ShieldCheck className="w-6 h-6 mr-2" />
                 <h3 className="font-bold text-lg text-white">{t.skills.blockTitle}</h3>
+                <Badge count={10} variant="lime" />
               </div>
               <div className="flex flex-wrap gap-2">
                 {['EVM', 'Solidity', 'Ride', 'Vyper', 'Hardhat', 'Remix', 'Web3.py', 'Ethers.js', 'DEX/CEX', 'Smart Contracts'].map(skill => (
-                  <span key={skill} className="px-3 py-1 bg-gray-900 text-lime-300 text-sm rounded-lg border border-gray-700">{skill}</span>
+                  <Tooltip key={skill} content={skill} side="top">
+                    <span className="px-3 py-1 bg-gray-900 text-lime-300 text-sm rounded-lg border border-gray-700 hover:border-lime-400/50 hover:shadow-[0_0_10px_rgba(163,230,53,0.15)] transition-all duration-300 cursor-default">{skill}</span>
+                  </Tooltip>
                 ))}
               </div>
             </div>
@@ -604,10 +737,13 @@ export default function App() {
               <div className="flex items-center mb-4 text-purple-400">
                 <Code className="w-6 h-6 mr-2" />
                 <h3 className="font-bold text-lg text-white">{t.skills.qaTitle}</h3>
+                <Badge count={10} variant="purple" />
               </div>
               <div className="flex flex-wrap gap-2">
                 {['Python', 'Java', 'Selenium', 'Postman', 'JMeter', 'End-to-End', 'API Testing', 'gRPC', 'GraphQL', 'Testnet/Mainnet'].map(skill => (
-                  <span key={skill} className="px-3 py-1 bg-gray-900 text-purple-300 text-sm rounded-lg border border-gray-700">{skill}</span>
+                  <Tooltip key={skill} content={skill} side="top">
+                    <span className="px-3 py-1 bg-gray-900 text-purple-300 text-sm rounded-lg border border-gray-700 hover:border-purple-400/50 hover:shadow-[0_0_10px_rgba(168,85,247,0.15)] transition-all duration-300 cursor-default">{skill}</span>
+                  </Tooltip>
                 ))}
               </div>
             </div>
@@ -616,10 +752,13 @@ export default function App() {
               <div className="flex items-center mb-4 text-blue-400">
                 <Cpu className="w-6 h-6 mr-2" />
                 <h3 className="font-bold text-lg text-white">{t.skills.sysTitle}</h3>
+                <Badge count={9} variant="blue" />
               </div>
               <div className="flex flex-wrap gap-2">
                 {['Docker', 'Git', 'Jira', 'Linux (Ubuntu)', 'MacOS', 'Windows 11', 'CI/CD', 'SQL', 'OSINT'].map(skill => (
-                  <span key={skill} className="px-3 py-1 bg-gray-900 text-blue-300 text-sm rounded-lg border border-gray-700">{skill}</span>
+                  <Tooltip key={skill} content={skill} side="top">
+                    <span className="px-3 py-1 bg-gray-900 text-blue-300 text-sm rounded-lg border border-gray-700 hover:border-blue-400/50 hover:shadow-[0_0_10px_rgba(96,165,250,0.15)] transition-all duration-300 cursor-default">{skill}</span>
+                  </Tooltip>
                 ))}
               </div>
             </div>
@@ -713,6 +852,9 @@ export default function App() {
         <p>© 2026 Boklag Aleksei. {t.role}.</p>
         <p className="mt-2 text-xs">{t.developedWith}</p>
       </footer>
+
+      {/* SCROLL TO TOP — masterpiece aurora button */}
+      <ScrollToTopButton />
     </div>
   );
 }
