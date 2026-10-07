@@ -194,7 +194,7 @@ const ScrollToTopButton = () => {
 // --- СЛОВАРЬ ПЕРЕВОДОВ (i18n DICTIONARY) ---
 const translations = {
   en: {
-    role: "Senior QA Engineer",
+    role: "Senior AI & Blockchain Developer",
     summaryTitle: "Profile (Summary)",
     summary1: "Over 12 years of experience. Specializing in testing backend, blockchain, and frontend components. Deep understanding of mechanics in decentralized pools (DEX), arbitrage bots, slippage, and risk analysis.",
     summary2: "Experience with digital voucher distribution systems (cryptocurrency, PayPal, banks). Conducting CEX, DEX, OTC, KYC, KYT, NFT testing. Smart contract testing (Solidity, Vyper) using ethers, web3py, Hardhat.",
@@ -206,8 +206,9 @@ const translations = {
     awardsSubtitle: "Awards",
     langSubtitle: "Languages",
     developedWith: "Developed with React, Tailwind CSS & Canvas API.",
-    skills: { blockTitle: "Blockchain / Web3", qaTitle: "Automation / QA", sysTitle: "Tools / Systems" },
+    skills: { langTitle: "Programming Languages", blockTitle: "Blockchain / Web3", qaTitle: "Automation / QA", sysTitle: "Tools / Systems" },
     experience: [
+      { role: "Senior AI & Blockchain Developer", company: "Cancore", period: "Apr 2026 - Present", description: "Building a cross-chain atomic swap platform between Canton Network and EVM chains (HTLC, DvP): Daml and Solidity contracts, NestJS/TypeScript microservices, formal verification. Designing autonomous multi-agent development pipelines (MCP servers, TDD loops, automated code review). Open-source contributions to OpenVINO GenAI and Unsloth (Intel Arc inference, model export)." },
       { role: "Automation QA Engineer L1/L2", company: "Web3tech (Waves)", period: "Oct 2023 - Present", description: "Testing blockchain level 1 and 2 nodes (Scala Waves, Besu). Developing automated tests in Java. API testing (gRPC, GraphQL, WebSocket). Validation of transactions, signatures, and rollbacks. Writing smart contracts (Ride, Solidity). Local deployment of private blockchains (Docker Compose, DevNet, StageNet). Faucet, ENS, ERC20 Uniswap deploy." },
       { role: "QA Engineer", company: "Testerwork", period: "Jul 2023 - Oct 2023", description: "Exploratory testing and bug hunting in various projects: TripAdvisor, Booking, Oculus Meta 2 VR. Testing across PC, iPhone, and Android devices." },
       { role: "Lead QA Engineer", company: "Eywa.fi", period: "May 2022 - Jul 2023", description: "Quality control organization, assisting in smart contract audits with static analyzers. Investigation of errors in microservices and oracles. Working with Curve stable pools, Uniswap V2, ERC20/ERC721. Testing hot/cold wallet integrations and node redundancy. OSINT and blockchain analytics." },
@@ -217,7 +218,7 @@ const translations = {
     ]
   },
   es: {
-    role: "Ingeniero QA Senior",
+    role: "Desarrollador Senior de IA y Blockchain",
     summaryTitle: "Perfil (Resumen)",
     summary1: "Más de 12 años de experiencia. Especializado en pruebas de componentes backend, blockchain y frontend. Profundo conocimiento de las mecánicas en pools descentralizados (DEX), bots de arbitraje, slippage y análisis de riesgos.",
     summary2: "Experiencia con sistemas de distribución de vales digitales (criptomonedas, PayPal, bancos). Realización de pruebas CEX, DEX, OTC, KYC, KYT, NFT. Pruebas de contratos inteligentes (Solidity, Vyper) usando ethers, web3py, Hardhat.",
@@ -229,8 +230,9 @@ const translations = {
     awardsSubtitle: "Premios",
     langSubtitle: "Idiomas",
     developedWith: "Desarrollado con React, Tailwind CSS y Canvas API.",
-    skills: { blockTitle: "Blockchain / Web3", qaTitle: "Automatización / QA", sysTitle: "Herramientas / Sistemas" },
+    skills: { langTitle: "Lenguajes de programación", blockTitle: "Blockchain / Web3", qaTitle: "Automatización / QA", sysTitle: "Herramientas / Sistemas" },
     experience: [
+      { role: "Desarrollador Senior de IA y Blockchain", company: "Cancore", period: "Abr 2026 - Presente", description: "Desarrollo de una plataforma de swaps atómicos entre Canton Network y cadenas EVM (HTLC, DvP): contratos Daml y Solidity, microservicios NestJS/TypeScript, verificación formal. Diseño de pipelines autónomos de desarrollo multiagente (servidores MCP, ciclos TDD, revisión automática de código). Contribuciones open source a OpenVINO GenAI y Unsloth (inferencia en Intel Arc, exportación de modelos)." },
       { role: "Ingeniero QA Automatización L1/L2", company: "Web3tech (Waves)", period: "Oct 2023 - Presente", description: "Pruebas de nodos blockchain nivel 1 y 2 (Scala Waves, Besu). Desarrollo de pruebas automáticas en Java. Pruebas de API (gRPC, GraphQL, WebSocket). Validación de transacciones, firmas. Escritura de contratos inteligentes (Ride, Solidity). Despliegue local (Docker Compose, DevNet)." },
       { role: "Ingeniero QA", company: "Testerwork", period: "Jul 2023 - Oct 2023", description: "Pruebas exploratorias y búsqueda de errores en proyectos: TripAdvisor, Booking, Oculus Meta 2 VR. Pruebas en dispositivos PC, iPhone y Android." },
       { role: "Ingeniero QA Principal", company: "Eywa.fi", period: "May 2022 - Jul 2023", description: "Organización de control de calidad, auditoría de contratos inteligentes. Investigación de errores en microservicios y oráculos. Trabajo con pools Curve, Uniswap V2, ERC20/ERC721. Pruebas de integración de billeteras y redundancia de nodos. OSINT y analítica blockchain." },
@@ -240,7 +242,7 @@ const translations = {
     ]
   },
   ru: {
-    role: "Senior QA Engineer",
+    role: "Senior AI & Blockchain Developer",
     summaryTitle: "Профиль (Summary)",
     summary1: "Более 12 лет опыта. Специализируюсь на тестировании backend, blockchain и frontend компонентов. Глубокое понимание механик децентрализованных пулов (DEX), арбитражных ботов, анализа рисков и проскальзываний.",
     summary2: "Опыт работы с системами дистрибуции цифровых ваучеров (криптовалюты, PayPal, банки). Проведение CEX, DEX, OTC, KYC, KYT, NFT тестирования. Тестирование смарт-контрактов (Solidity, Vyper) с использованием ethers, web3py, Hardhat.",
@@ -252,8 +254,9 @@ const translations = {
     awardsSubtitle: "Награды",
     langSubtitle: "Языки",
     developedWith: "Разработано с использованием React, Tailwind CSS и Canvas API.",
-    skills: { blockTitle: "Blockchain / Web3", qaTitle: "Automation / QA", sysTitle: "Tools / Systems" },
+    skills: { langTitle: "Языки программирования", blockTitle: "Blockchain / Web3", qaTitle: "Automation / QA", sysTitle: "Tools / Systems" },
     experience: [
+      { role: "Senior AI & Blockchain Developer", company: "Cancore", period: "Апр. 2026 - Настоящее время", description: "Разработка платформы кросс-чейн атомарных свопов между Canton Network и EVM-сетями (HTLC, DvP): контракты на Daml и Solidity, микросервисы на NestJS/TypeScript, формальная верификация. Проектирование автономных мультиагентных пайплайнов разработки (MCP-серверы, TDD-циклы, автоматическое ревью кода). Вклад в open source: OpenVINO GenAI и Unsloth (инференс на Intel Arc, экспорт моделей)." },
       { role: "Automation QA Engineer L1/L2", company: "Web3tech (Waves)", period: "Окт. 2023 - Настоящее время", description: "Тестирование блокчейн-узлов (Scala Waves, Besu). Разработка автотестов на Java. Тестирование API (gRPC, GraphQL, WebSocket). Валидация транзакций, подписей, откатов. Написание смарт-контрактов (Ride, Solidity). Локальное развертывание приватных блокчейнов (Docker Compose, DevNet, StageNet). Faucet, ENS, ERC20 Uniswap deploy." },
       { role: "QA Engineer", company: "Testerwork", period: "Июль 2023 - Окт. 2023", description: "Исследовательское тестирование и bug hunting в проектах: TripAdvisor, Booking, Oculus Meta 2 VR. Тестирование на PC, iPhone и Android устройствах." },
       { role: "Lead QA Engineer", company: "Eywa.fi", period: "Май 2022 - Июль 2023", description: "Организация контроля качества, аудит смарт-контрактов со статическими анализаторами. Исследование ошибок микросервисов, оракулов. Работа со стабильными пулами Curve, Uniswap V2, ERC20/ERC721. Тестирование интеграции горячих и холодных кошельков, устойчивости нод. OSINT и блокчейн-аналитика." },
@@ -796,7 +799,22 @@ export default function App() {
             <div className="h-[1px] flex-grow bg-gradient-to-r from-lime-400/50 to-transparent ml-6"></div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-gray-800/40 p-6 rounded-2xl border border-gray-700/50 hover:border-amber-400/50 transition-colors">
+              <div className="flex items-center mb-4 text-amber-400">
+                <Code className="w-6 h-6 mr-2" />
+                <h3 className="font-bold text-lg text-white">{t.skills.langTitle}</h3>
+                <Badge count={10} variant="lime" />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['TypeScript', 'Rust', 'Scala', 'Python', 'Solidity', 'Daml', 'Go', 'Java', 'Swift', 'Bash'].map(skill => (
+                  <Tooltip key={skill} content={skill} side="top">
+                    <span className="px-3 py-1 bg-gray-900 text-amber-300 text-sm rounded-lg border border-gray-700 hover:border-amber-400/50 hover:shadow-[0_0_10px_rgba(251,191,36,0.15)] transition-all duration-300 cursor-default">{skill}</span>
+                  </Tooltip>
+                ))}
+              </div>
+            </div>
+
             <div className="bg-gray-800/40 p-6 rounded-2xl border border-gray-700/50 hover:border-lime-400/50 transition-colors">
               <div className="flex items-center mb-4 text-lime-400">
                 <ShieldCheck className="w-6 h-6 mr-2" />
